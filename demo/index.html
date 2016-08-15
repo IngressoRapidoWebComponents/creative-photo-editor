@@ -80,7 +80,7 @@
                   filesSize = uploader.files.length;
 
                   if (uploader.files.length > 0) {
-
+                      uploader.files[0].uploading = true;
                       var reader = new FileReader();
 
                       reader.onload = function (e) {
