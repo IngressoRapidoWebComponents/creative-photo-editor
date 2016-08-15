@@ -1,0 +1,30 @@
+{
+  "name": "creative-photo-editor",
+  "description": "The `creative-photo-editor` is a wrapper of the best FREE Phonto Editor, Adobe Creative (https://creativesdk.adobe.com), but with fixes to works well with web components. Maybe you will want your own api key to run in production, you can get one for FREE creating an account in https://creativesdk.adobe.com/myapps.html",
+  "homepage": "https://ingressorapidowebcomponents.github.io/components/creative-photo-editor",
+  "main": "creative-photo-editor.html",
+  "authors": [
+    "Andrew Willard (https://github.com/andrew-silva-movile)"
+  ],
+  "keywords": [
+    "web-components",
+    "web-component",
+    "polymer",
+    "photo",
+    "editor",
+    "creative",
+    "adobe",
+    "image",
+    "filter"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.4.0"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.0.0",
+    "web-component-tester": "^4.0.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0",
+    "vaadin-upload": "vaadin/vaadin-upload#^1.0.0"
+  }
+}

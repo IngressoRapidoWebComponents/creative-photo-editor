@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+  <head>
+    <title>creative-photo-editor demo</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+    <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+    <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+    <link rel="import" href="../../vaadin-upload/vaadin-upload.html">
+
+    <link rel="import" href="../creative-photo-editor.html">
+
+    <style is="custom-style" include="demo-pages-shared-styles">
+    </style>
+  </head>
+  <body onload="configure()">
+
+    <div class="vertical-section-container">
+      <h3>Basic creative-photo-editor Demo</h3>
+      <demo-snippet width="100%">
+        <template>
+          <img id="imageDisplay" src="image.jpg" style="width: 100%;">
+          <creative-photo-editor
+            id="demo"
+            language="en"
+            api-key="1234567"
+            on-save="_changeImageToNewImage"
+            image="imageDisplay">
+          </creative-photo-editor>
+
+          <button onclick="edit(event)">Edit</button>
+        </template>
+      </demo-snippet>
+    </div>
+
+    <div class="vertical-section-container">
+        <h3>Using external element to upload image</h3>
+        <demo-snippet width="100%">
+            <template>
+                <img id="uploadImage" style="width: 100%;">
+                <creative-photo-editor
+                        id="demo2"
+                        api-key="1234567"
+                        on-save="_changeImageToNewImage"
+                        image="uploadImage">
+                </creative-photo-editor>
+
+                <vaadin-upload
+                    max-files="1" accept=".jpg,.png">
+                </vaadin-upload>
+            </template>
+        </demo-snippet>
+    </div>
+
+    <script>
+      function edit(event) {
+        var editor = event.target.parentElement.querySelector('#demo');
+        var imageDisplay = event.target.parentElement.querySelector('#imageDisplay');
+
+        editor.addEventListener('save', function(e) {
+          imageDisplay.src = e.detail.url;
+        });
+
+        editor.create();
+      }
+      function configure() {
+          var filesSize = 0;
+          var uploader = document.querySelector('vaadin-upload');
+          var editor = document.querySelector('#demo2');
+          var imageDisplay = document.querySelector('#uploadImage');
+
+          editor.addEventListener('save', function(e, detail) {
+              imageDisplay.src = e.detail.url;
+          });
+
+          uploader.addEventListener('files-changed', function() {
+              if (uploader.files.length != filesSize) {
+                  filesSize = uploader.files.length;
+
+                  if (uploader.files.length > 0) {
+
+                      var reader = new FileReader();
+
+                      reader.onload = function (e) {
+                          imageDisplay.src = e.target.result;
+                          editor.create();
+                      };
+
+                      reader.readAsDataURL(uploader.files[0]);
+
+                  } else {
+                      imageDisplay.src = '';
+                  }
+              }
+          });
+
+
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,542 @@
+<!--
+@license
+Copyright (c) 2016 The Ingresso Rápido Web Components Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://ingressorapidowebcomponents.github.io/LICENSE.txt
+The complete set of authors may be found at http://ingressorapidowebcomponents.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://ingressorapidowebcomponents.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+<script src="scripts/editor.js"></script>
+
+<!--
+The `creative-photo-editor` is a wrapper of the best FREE Phonto Editor, Adobe Creative (https://creativesdk.adobe.com), but with fixes to works well with web components.
+Maybe you will want your own api key to run in production, you can get one for FREE creating an account in https://creativesdk.adobe.com/myapps.html
+
+Many features, customize as you want:
+
+![alt Editor](demo/editor.png)
+
+![alt Editor 2](demo/editor2.png)
+
+It's simple:
+```html
+    <img id="imageDisplay" src="image.jpg">
+    <creative-photo-editor
+        id="example"
+        api-key="1234567"
+        image="imageDisplay">
+    </creative-photo-editor>
+```
+
+After that, create an editor:
+```js
+    this.$.example.create();
+```
+
+DONE!
+
+@demo demo/index.html
+
+-->
+
+<dom-module id="creative-photo-editor">
+    <script>
+        Polymer({
+
+            is: 'creative-photo-editor',
+
+            properties: {
+                _featherEditor: {
+                    type: Object
+                },
+                /**
+                 * required
+                 *
+                 * Either the image element to be edited or its ID.
+                 * Note: Make sure the DOM has loaded before attempting select an element to pass as image, or use its ID instead. The image itself must be located in a publicly-accessible web folder, otherwise the widget will not work.
+                 *
+                 * @type String
+                 */
+                image: {
+                    type: String
+                },
+                /**
+                 * required
+                 *
+                 * Get your API key from the Get Key page. Saving will not work without it!
+                 * Note: when generating your API key, provide your root domain, even if you will be using it on subdomains.
+                 *
+                 * @type String
+                 */
+                apiKey: {
+                    type: String
+                },
+                /**
+                 *
+                 * Choose from 'dark' or 'light' themes. Default value is 'dark'. You can also use the 'minimum' theme to reduce our styles to the bare minimum in order to more easily add your own styles (https://developers.aviary.com/docs/web/setup-guide#styling) on top. This removes most textures, shadows, rounded corners, and gradients that can be tedious to reset.
+                 *
+                 * @type String
+                 */
+                theme: {
+                    type: String
+                },
+                /**
+                 *
+                 * The widget will be inserted inside the element with the DOM ID specified.
+                 * Note: For best results, this should be a <div /> element
+                 *
+                 * @type String
+                 */
+                appendTo: {
+                    type: String
+                },
+                /**
+                 *
+                 * The widget's UI is being localized into many languages. You can choose from the following languages in addition to enEnglish (default):
+                 *
+                 * * bg Bulgarian
+                 * * ca Catalan
+                 * * zh_HANS Chinese (simplified)
+                 * * zh_HANT Chinese (traditional)
+                 * * cs Czech
+                 * * da Danish
+                 * * nl Dutch
+                 * * fi Finnish
+                 * * fr French
+                 * * de German
+                 * * el Greek
+                 * * he Hebrew
+                 * * hu Hungarian
+                 * * id Indonesian
+                 * * it Italian
+                 * * ja Japanese
+                 * * ko Korean
+                 * * lv Latvian
+                 * * lt Lithuanian
+                 * * no Norwegian
+                 * * pl Polish
+                 * * pt Portuguese
+                 * * pt_BR Portuguese (Brazilian)
+                 * * ru Russian
+                 * * es Spanish
+                 * * sl Slovak
+                 * * sv Swedish
+                 * * tr Turkish
+                 * * vi Vietnamese
+                 *
+                 * Note: You can also help us translate your own language! Shoot us an email at api@aviary.com if you'd like to send us a translation for a new language, or if you spot something missing or incorrect in our current offerings.
+                 *
+                 * @type String
+                 */
+                language: {
+                    type: String
+                },
+                /**
+                 *
+                 * Enabling CORS lets the Editor load your images instantaneously. Otherwise we have to work some magic (by using JSONP image laundering service) to get the image data into the client's browser across domains. We highly encourage you to enable this for a better user experience.
+                 * Note: You must setup & add the appropriate CORS headers on the server endpoint that hosts your images. Please see: http://enable-cors.org/ for more information and how to set it up on your server. If you have any specific questions, please contact us
+                 *
+                 * @type Boolean
+                 */
+                enableCORS: {
+                    type: Boolean
+                },
+                /**
+                 *
+                 * Set a max size of drawing canvas. See Best Practices (https://developers.aviary.com/docs/web/setup-guide#best).
+                 *
+                 * @type Number
+                 */
+                maxSize: {
+                    type: Number
+                },
+                /**
+                 *
+                 * Set to 'true' to remove the close button.
+                 *
+                 * @type Boolean
+                 */
+                noCloseButton: {
+                    type: Boolean
+                },
+                /**
+                 *
+                 * Set the launch fade-in animation time in milliseconds.
+                 *
+                 * @type Number
+                 */
+                launchDelay: {
+                    type: Number
+                },
+                /**
+                 *
+                 * Set the close fade-out animation time in milliseconds.
+                 *
+                 * @type Number
+                 */
+                closeDelay: {
+                    type: Number
+                },
+                /**
+                 *
+                 * Select which editing tools you would like to display in the tools panel. We recommend either omitting tools or setting it to 'all' which will automatically give you our most up-to-date selection of recommended tools without updating your integration code.
+                 *
+                 *  * all: selects all Aviary-recommended tools. (default)
+                 *
+                 * You can also specify one or more options by name in an array or comma-separated string. Choose from our latest set of tools below:
+                 *
+                 * * enhance: Autocorrect your photo with one of four basic enhancements.
+                 * * effects: Choose from a variety of effects and filters for your photo.
+                 * * frames: Choose from a variety of frames to apply around your photo.
+                 * * stickers: Choose from a variety of stickers you can resize and place on your photo.
+                 * * orientation: Rotate and flip your photo in one tool.
+                 * * focus: Adds a selective linear or radial focus to your photo.
+                 * * resize: Resize the image using width and height number fields.
+                 * * crop: Crop a portion of your photo. Add presets via API. Fixed-pixel cropPresets perform a resize when applied.
+                 * * warmth: Adjust the overall image color temperature.
+                 * * brightness: Adjust the overall image brightness.
+                 * * contrast: Adjust the overall image contrast.
+                 * * saturation: Adjust the overall image saturation.
+                 * * sharpness: Blur or sharpen the overall image in one tool.
+                 * * colorsplash: Use a smart brush to colorize parts of your photo which becomes grayscale otherwise.
+                 * * draw: Add doodle overlays with a brush.
+                 * * text: Add custom, resizable text.
+                 * * redeye: Remove redeye from your photo with a brush.
+                 * * whiten: Whiten teeth with a brush. (Not supported in IE8)
+                 * * blemish: Remove skin blemishes with a brush.
+                 *
+                 * Tool Order: the order in which you list the options is the order in which they will appear in the editor. The editor options will be paged, so put the most important functions up front.
+                 *
+                 * @type Object
+                 */
+                tools: {
+                    type: Object
+                },
+                /**
+                 *
+                 * The widget can start with a specific tool open by passing its name here.
+                 * Note: if you're looking to launch the editor with the Crop tool initialized, you may want to check out forceCropPreset below for a truly "forced crop" experience. initTool:crop will just open with the normal (not forceable) Crop tool.
+                 *
+                 * @type String
+                 */
+                initTool: {
+                    type: String
+                },
+                /**
+                 *
+                 * A comma-separated list of preset crop sizes or ratios for the crop tool. It can be a 2-D array (with labels), a 1-D array (without labels), or a comma-separated string (without labels). Any sizes over your maxSize will be excluded in the UI.
+                 *
+                 * Defaults:
+                 *
+                 * [
+                 *  'Custom',
+                 *  'Original',
+                 *  ['Square', '1:1'],
+                 *  '3:2', '5:3', '4:3', '5:4', '6:4', '7:5', '10:8', '16:9'
+                 * ]
+                 *
+                 * Preset dimensions are not included by default but can be added:
+                 *
+                 * [
+                 *  '320x240','640x480','800x600','1280x1024','1600x1200'
+                 * ]
+                 *
+                 * You can label the presets by providing each as an array:
+                 *
+                 * [
+                 *  ['Photo', '4:3'],
+                 *  ['HDTV', '16:9'],
+                 *  ['Avatar', '60x50']
+                 * ]
+                 *
+                 * Tip: if your users are likely to be sharing to Twitter or Facebook, we recommend including the following presets:
+                 *
+                 * [
+                 *  ['Twitter Preview', '2:1'],
+                 *  ['FB Cover Photo', '851x315']
+                 * ]
+                 *
+                 * @type Object
+                 */
+                cropPresets: {
+                    type: Object
+                },
+                /**
+                 *
+                 * Defaults to false, but if set to true, this will disable the inverting of crop presets. Crop presets can be inverted by the user (e.g. clicking "3:4" to change it to "4:3"), but are also inverted automatically based on the photo's initial orientation.
+                 *
+                 * @type Boolean
+                 */
+                cropPresetsStrict: {
+                    type: Boolean
+                },
+                /**
+                 *
+                 * Defaults to 'Custom'. You can set your default crop to be something else when the tool opens.
+                 * Note - if this preset is not found, the first crop preset is then selected.
+                 *
+                 * @type String
+                 */
+                cropPresetDefault: {
+                    type: String
+                },
+                /**
+                 *
+                 * If you would like to force the user to a specific crop preset (dimension or ratio), you can pass a cropPreset when you use the create() method. This will force the user into a special version of the crop tool when created. They will not be able to proceed into the full editor until they apply your predefined crop.
+                 *
+                 * @type Object
+                 */
+                forceCropPreset: {
+                    type: Object
+                },
+                /**
+                 *
+                 * If you are using forceCropPreset, you can also enter in a custom message for your users above. The message will appear above the cropPreset label.
+                 *
+                 * @type String
+                 */
+                forceCropMessage: {
+                    type: String
+                },
+                /**
+                 *
+                 * Read only
+                 *
+                 * @type String
+                 */
+                url: {
+                    type: String
+                },
+                /**
+                 *
+                 * Set the saved file format. Accepts: png, jpg. The default behavior is to derive the format from the original file extension.
+                 *
+                 * @type String
+                 */
+                fileFormat: {
+                    type: String
+                },
+                /**
+                 *
+                 * Set to true to allow a user to see the actual size of the photo (in pixels) in the bottom left corner of the editor.
+                 * Note - This reflects output size and may be different from the original image.
+                 *
+                 * @type Boolean
+                 */
+                displayImageSize: {
+                    type: Boolean
+                },
+                _onReady: {
+                    type: Object
+                },
+                _onSaveButtonClicked: {
+                    type: Object
+                },
+                _onSave: {
+                    type: Object
+                },
+                _onClose: {
+                    type: Object
+                },
+                _onError: {
+                    type: Object
+                }
+            },
+
+            _createConfig: function() {
+                return {
+                    apiKey: this.apiKey,
+                    image: this.image,
+                    theme: this.theme,
+                    appendTo: this.appendTo,
+                    language: this.language,
+                    enableCORS: this.enableCORS,
+                    maxSize: this.maxSize,
+                    noCloseButton: this.noCloseButton,
+                    launchDelay: this.launchDelay,
+                    closeDelay: this.closeDelay,
+                    tools: this.tools,
+                    initTool: this.initTool,
+                    cropPresets: this.cropPresets,
+                    cropPresetsStrict: this.cropPresetsStrict,
+                    cropPresetDefault: this.cropPresetDefault,
+                    forceCropPreset: this.forceCropPreset,
+                    forceCropMessage: this.forceCropMessage,
+                    fileFormat: this.fileFormat,
+                    jpgQuality: this.jpgQuality,
+                    displayImageSize: this.displayImageSize,
+                    onReady: this._onReady,
+                    onSaveButtonClicked: this._onSaveButtonClicked,
+                    onSave: this._onSave,
+                    onClose: this._onClose,
+                    onError: this._onError
+                };
+            },
+
+            _launch: function() {
+                var config = this._createConfig();
+                var host = this;
+
+                config.onSave = function(imageId, newUrl) {
+                    host.fire('save', { image_id: imageId, url: newUrl });
+                    if (!host.url) {
+                        host.url = newUrl;
+                    }
+                    return false;
+                };
+
+                if (host._featherEditor) {
+                    host._featherEditor.launch(config);
+                } else {
+                    config.onLoad = function(e) {
+                        host._featherEditor.launch(host._createConfig());
+                    };
+                    host._featherEditor = new Aviary.Feather(config);
+
+                    if (window.AV && window.AV.feather_loaded) {
+                        host._featherEditor.launch(config);
+                    }
+                }
+            },
+
+            _imageConfig: function() {
+                if (!this.image) {
+                    var img = new Image();
+                    img.src = this.url;
+                    this.image = img;
+                }
+                this._launch();
+            },
+            /**
+             *
+             * You can create the editor on demand.
+             * At this point you can override any of the configuration parameters except for theme and language.
+             *
+             */
+            create: function() {
+                var host = this;
+                if (host.url && host.url.indexOf("http") < 0 && host.url.indexOf("data:") < 0) {
+                    function response() {
+                        var reader = new FileReader();
+                        reader.onload = function (e) {
+                            host.url = e.target.result;
+                            host._imageConfig();
+                        };
+
+                        reader.readAsDataURL(this.response);
+                    }
+
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("GET", host.url);
+                    xhr.responseType = "blob";
+                    xhr.onload = response;
+                    xhr.send();
+                }
+                else {
+                    this._imageConfig();
+                }
+            },
+            /**
+             *
+             * You can ask for the current image pixel dimensions on demand through the API
+             * This will return an object with width and height properties.
+             *
+             */
+            getImageDimensions: function () {
+                this._featherEditor.getImageDimensions();
+            },
+            /**
+             *
+             * Show the wait indicator (spinning overlay on top of photo).
+             *
+             */
+            showWaitIndicator: function() {
+                this._featherEditor.showWaitIndicator();
+            },
+            /**
+             *
+             * Hide the wait indicator (spinning overlay on top of photo).
+             *
+             */
+            hideWaitIndicator: function() {
+                this._featherEditor.hideWaitIndicator();
+            },
+            /**
+             *
+             * The save method lets you save progress through some separate UI, such as a button on your hosting page. It is not typically necessary, as the user can always save from within the editor at any time.
+             *
+             */
+            save: function() {
+                this._featherEditor.save();
+            },
+            /**
+             *
+             * You can shut down the editor programmatically.
+             * Use with care, as this will discard any unsaved changes without prompting the user. For this reason it is commonly used onSave if at all.
+             * May be useful when noCloseButton is set to true.
+             *
+             */
+            destroy: function() {
+                this._featherEditor.close();
+            },
+            /**
+             * Pass a function to be called once the editor has finished launching and is ready for user input.
+             * @param onReadyFunction
+             */
+            onReady: function(onReadyFunction) {
+                this._onReady = onReadyFunction;
+            },
+            /**
+             * Pass a function to be called before an image save happens, but after a user has clicked the save button, intending to save.
+             * imageID gives you an ID to reference the original image being edited.
+             *
+             * Return false to this handler if you'd like to abort the save process.
+             * Note - You can always asynchronously re-initiate the save using save(). This allows you to present a custom confirmation to the user or wait for some custom processing to complete before the save is initiated.
+             *
+             * @param onSaveButtonClickedFunction
+             */
+            onSaveButtonClicked: function(onSaveButtonClickedFunction) {
+                this._onSaveButtonClicked = onSaveButtonClickedFunction;
+            },
+            /**
+             * Pass a function to be called when the image save is complete. A This can be used to set the image in the DOM to point to the new source.
+             * imageID gives you an ID to reference the original image being edited.
+             * newURL is a link to the saved image. It will persist at this address for approximately 72 hours.
+             * Return false to this handler if you'd like to suppress the built-in save confirmation dialog.
+             *
+             * @param onSaveFunction
+             */
+            onSave: function(onSaveFunction) {
+                this._onSave = onSaveFunction;
+            },
+
+            /**
+             * Pass a function to be called when the editor is closed.
+             * isDirty tells whether the editor was closed with unsaved changes.
+             *
+             * @param onDestroyFunction
+             */
+            onDestroy: function(onDestroyFunction) {
+                this._onClose = onDestroyFunction;
+            },
+
+            /**
+             * The API can notify you of errors and you have the option to notify the user. They are otherwise silent.
+             * errorObj is an object with the following properties:
+             *
+             * * code : int representing the error type. For example, 1 corresponds to an image that could not be processed.
+             * * message : An error message you could pass along to the user.
+             * * args : This is an array of additional values that varies by error type. For example, error type 1, bad image, will send the problematic URL as the only argument in the array. This could assist in debugging or helping a user correct a specific problem.
+             *
+             * @param onErrorFunction
+             */
+            onError: function(onErrorFunction) {
+                this._onError = onErrorFunction;
+            }
+
+        });
+    </script>
+</dom-module>
