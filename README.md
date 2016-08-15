@@ -1,38 +1,32 @@
 # \<creative-photo-editor\>
 
 A Polymer web component for Adobe Creative
+_[Demo and API docs](https://ingressorapidowebcomponents.github.io/components/creative-photo-editor)_
 
-## Install the Polymer-CLI
+The `creative-photo-editor` is a wrapper of the best FREE Phonto Editor, Adobe Creative (https://creativesdk.adobe.com), but with fixes to works well with web components.
+Maybe you will want your own api key to run in production, you can get one for FREE creating an account in https://creativesdk.adobe.com/myapps.html
 
-First, make sure you have the [Polymer CLI](https://www.npmjs.com/package/polymer-cli) installed. Then run `polymer serve` to serve your application locally.
+Many features, customize as you want:
 
-## Viewing Your Application
+![alt Editor](demo/editor.png)
 
-```
-$ polymer serve
-```
+![alt Editor 2](demo/editor2.png)
 
-## Building Your Application
-
-```
-$ polymer build
-```
-
-This will create a `build/` folder with `bundled/` and `unbundled/` sub-folders
-containing a bundled (Vulcanized) and unbundled builds, both run through HTML,
-CSS, and JS optimizers.
-
-You can serve the built versions by giving `polymer serve` a folder to serve
-from:
-
-```
-$ polymer serve build/bundled
+It's simple:
+```html
+    <img id="imageDisplay" src="image.jpg">
+    <creative-photo-editor
+        id="example"
+        api-key="1234567"
+        image="imageDisplay">
+    </creative-photo-editor>
 ```
 
-## Running Tests
-
+After that, create an editor:
+```js
+    this.$.example.create();
 ```
-$ polymer test
-```
 
-Your application is already set up to be tested via [web-component-tester](https://github.com/Polymer/web-component-tester). Run `polymer test` to run your application's test suite locally.
+DONE!
+
+@demo demo/index.html
