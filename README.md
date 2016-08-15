@@ -28,5 +28,3 @@ After that, create an editor:
 ```
 
 DONE!
-
-@demo demo/index.html
