@@ -15,7 +15,7 @@ Many features, customize as you want:
 
 ![alt Editor](https://cdn.rawgit.com/IngressoRapidoWebComponents/creative-photo-editor/master/demo/editor.png)
 
-![alt Editor 2](https://cdn.rawgit.com/IngressoRapidoWebComponents/creative-photo-editor/master/demo/editor.png)
+![alt Editor 2](https://cdn.rawgit.com/IngressoRapidoWebComponents/creative-photo-editor/master/demo/editor2.png)
 
 It's simple:
 ```html
