@@ -1,3 +1,8 @@
+[![bower version](https://img.shields.io/bower/v/creative-photo-editor.svg)](https://libraries.io/bower/creative-photo-editor)
+[![open issues](https://img.shields.io/github/issues/IngressoRapidoWebComponents%2Fcreative-photo-editor.svg)](https://github.com/IngressoRapidoWebComponents/creative-photo-editor/issues)
+[![license](https://img.shields.io/github/license/IngressoRapidoWebComponents%2Fcreative-photo-editor.svg)](https://github.com/IngressoRapidoWebComponents/creative-photo-editor/blob/master/LICENSE)
+
+
 # \<creative-photo-editor\>
 
 A Polymer web component for Adobe Creative
@@ -8,9 +13,9 @@ Maybe you will want your own api key to run in production, you can get one for F
 
 Many features, customize as you want:
 
-![alt Editor](demo/editor.png)
+![alt Editor](https://cdn.rawgit.com/IngressoRapidoWebComponents/creative-photo-editor/master/demo/editor.png)
 
-![alt Editor 2](demo/editor2.png)
+![alt Editor 2](https://cdn.rawgit.com/IngressoRapidoWebComponents/creative-photo-editor/master/demo/editor.png)
 
 It's simple:
 ```html
