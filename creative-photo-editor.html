@@ -26,13 +26,13 @@ It's simple:
     <img id="imageDisplay" src="image.jpg">
     <creative-photo-editor
         id="example"
-        api-key="1234567"
-        image="imageDisplay">
+        api-key="1234567">
     </creative-photo-editor>
 ```
 
 After that, create an editor:
 ```js
+    this.$.example.image = this.$.imageDisplay;
     this.$.example.create();
 ```
 
@@ -49,19 +49,34 @@ DONE!
             is: 'creative-photo-editor',
 
             properties: {
+                /**
+                 *
+                 * Editor instance
+                 *
+                 * @type Object
+                 */
                 _featherEditor: {
                     type: Object
                 },
                 /**
-                 * required
                  *
-                 * Either the image element to be edited or its ID.
-                 * Note: Make sure the DOM has loaded before attempting select an element to pass as image, or use its ID instead. The image itself must be located in a publicly-accessible web folder, otherwise the widget will not work.
+                 * Read only
                  *
                  * @type String
                  */
-                image: {
+                _url: {
                     type: String
+                },
+                /**
+                 * required
+                 *
+                 * The image element to be edited
+                 * Note: Make sure the DOM has loaded before attempting select an element to pass as image. The image itself must be located in a publicly-accessible web folder, otherwise the widget will not work.
+                 *
+                 * @type Object
+                 */
+                image: {
+                    type: Object
                 },
                 /**
                  * required
@@ -290,7 +305,7 @@ DONE!
                  * @type Object
                  */
                 forceCropPreset: {
-                    type: Object
+                    type: Array
                 },
                 /**
                  *
@@ -299,15 +314,6 @@ DONE!
                  * @type String
                  */
                 forceCropMessage: {
-                    type: String
-                },
-                /**
-                 *
-                 * Read only
-                 *
-                 * @type String
-                 */
-                url: {
                     type: String
                 },
                 /**
@@ -382,13 +388,12 @@ DONE!
 
                 config.onSave = function(imageId, newUrl) {
                     host.fire('save', { image_id: imageId, url: newUrl });
-                    if (!host.url) {
-                        host.url = newUrl;
-                    }
+                    host._url = newUrl;
                     return false;
                 };
 
                 if (host._featherEditor) {
+                    config.url = host._url;
                     host._featherEditor.launch(config);
                 } else {
                     config.onLoad = function(e) {
@@ -405,7 +410,7 @@ DONE!
             _imageConfig: function() {
                 if (!this.image) {
                     var img = new Image();
-                    img.src = this.url;
+                    img.src = this._url;
                     this.image = img;
                 }
                 this._launch();
@@ -417,27 +422,7 @@ DONE!
              *
              */
             create: function() {
-                var host = this;
-                if (host.url && host.url.indexOf("http") < 0 && host.url.indexOf("data:") < 0) {
-                    function response() {
-                        var reader = new FileReader();
-                        reader.onload = function (e) {
-                            host.url = e.target.result;
-                            host._imageConfig();
-                        };
-
-                        reader.readAsDataURL(this.response);
-                    }
-
-                    var xhr = new XMLHttpRequest();
-                    xhr.open("GET", host.url);
-                    xhr.responseType = "blob";
-                    xhr.onload = response;
-                    xhr.send();
-                }
-                else {
-                    this._imageConfig();
-                }
+                this._imageConfig();
             },
             /**
              *
@@ -447,6 +432,14 @@ DONE!
              */
             getImageDimensions: function () {
                 this._featherEditor.getImageDimensions();
+            },
+            /**
+             *
+             * You can ask for the current image url, it can be a blob, relative or absolute URL
+             *
+             */
+            getImageUrl: function () {
+                return this._url;
             },
             /**
              *

@@ -43,8 +43,7 @@
                 <creative-photo-editor
                         id="demo2"
                         api-key="1234567"
-                        on-save="_changeImageToNewImage"
-                        image="uploadImage">
+                        on-save="_changeImageToNewImage">
                 </creative-photo-editor>
 
                 <vaadin-upload
@@ -85,6 +84,7 @@
 
                       reader.onload = function (e) {
                           imageDisplay.src = e.target.result;
+                          editor.image = imageDisplay;
                           editor.create();
                       };
 
