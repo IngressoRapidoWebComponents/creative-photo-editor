@@ -1,7 +1,7 @@
 {
   "name": "creative-photo-editor",
   "description": "The `creative-photo-editor` is a wrapper of the best FREE Phonto Editor, Adobe Creative (https://creativesdk.adobe.com), but with fixes to works well with web components. Maybe you will want your own api key to run in production, you can get one for FREE creating an account in https://creativesdk.adobe.com/myapps.html",
-  "version": "1.0.1",
+  "version": "1.1.1",
   "homepage": "https://ingressorapidowebcomponents.github.io/components/creative-photo-editor",
   "main": "creative-photo-editor.html",
   "authors": [
