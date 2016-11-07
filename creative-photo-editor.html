@@ -393,7 +393,7 @@ DONE!
         };
 
         if (host._featherEditor) {
-          config.url = host._url;
+          config.url = host._url == undefined ? '' : host._url;
           host._featherEditor.launch(config);
         } else {
           config.onLoad = function(e) {
@@ -473,7 +473,11 @@ DONE!
        *
        */
       destroy: function() {
-        this._featherEditor.close();
+        this._url = undefined;
+        this.image = undefined;
+        if (this._featherEditor) {
+          this._featherEditor.close();
+        }
       },
       /**
        * Pass a function to be called once the editor has finished launching and is ready for user input.
